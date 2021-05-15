@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Book;
+use App\Models\Tag;
 
 class BookController extends Controller
 {
@@ -13,7 +15,8 @@ class BookController extends Controller
      */
     public function index()
     {
-        //
+        $books = Book::all();
+        return view('book.index', compact('books'));
     }
 
     /**
@@ -23,7 +26,8 @@ class BookController extends Controller
      */
     public function create()
     {
-        //
+        $tags = Tag::all();
+        return view('book.create', compact('tags'));
     }
 
     /**
@@ -34,7 +38,10 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $book = Book::create($request->all());
+        // attachメソッドを利用して、中間テーブルにデータを追加しています。
+        $book->tags()->attach(request()->tags);
+        return redirect()->route('book.index')->with('success', '新規登録完了しました');
     }
 
     /**
@@ -56,7 +63,10 @@ class BookController extends Controller
      */
     public function edit($id)
     {
-        //
+        $book = Book::find($id);
+        $tags = $book->tags->pluck('id')->toArray();
+        $tagList = Tag::all();
+        return view('book.edit', compact('book', 'tags', 'tagList'));
     }
 
     /**
@@ -68,7 +78,14 @@ class BookController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $update = [
+            'title' => $request->title,
+        ];
+        Book::where('id', $id)->update($update);
+        $book = Book::find($id);
+        // syncメソッドを利用して、中間テーブルの更新をおこなっています。
+        $book->tags()->sync(request()->tags);
+        return back()->with('success', '編集完了しました');
     }
 
     /**
@@ -79,6 +96,11 @@ class BookController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $book = Book::find($id);
+        $book->delete();
+        // detachメソッドを利用すると中間テーブルから関連するデータも削除されます。
+        // ただし、マイグレーションファイルにて外部キー制約を設定しているため、ここではdetachメソッドがなくても削除されます。
+        $book->tags()->detach();
+        return redirect()->route('book.index')->with('success', '削除完了しました');
     }
 }
