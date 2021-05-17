@@ -1,3 +1,7 @@
+# 参考
+
+https://noumenon-th.net/programming/2020/11/05/many-to-many/
+
 # Laravelインストール
 
 ```
@@ -66,10 +70,11 @@ mysql.server restart
 php artisan migrate
 ```
 
-# 
+# コントローラーファイルを作成
 
 ```
-
+php artisan make:controller BookController --resource
+php artisan make:controller TagController --resource
 ```
 
 # 
