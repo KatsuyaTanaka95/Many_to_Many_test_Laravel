@@ -8,7 +8,7 @@
 <form action="{{ route('book.update',$book->id)}}" method="POST">
     @csrf
     @method('PUT')
-    <p>タイトル<input type="text" name="title" value="{{ $book->title }}"></p>
+    <p>bookタイトル<input type="text" name="title" value="{{ $book->title }}"></p>
     <p>
         @foreach ($tagList as $tag)
         <label class="checkbox">
